@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name" >To-Do</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
+    <string name="appName">To-Do</string>
+    <string name="edit">edit</string>
+    <string name="add_a_task">Add a task</string>
+    <string name="add">Add</string>
+    <string name="choose_a_date">Choose a date</string>
+    <string name="choose_a_time">Choose a time</string>
+    <string name="task_name">Task Name</string>
+    <string name="description">Description</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+</resources>
