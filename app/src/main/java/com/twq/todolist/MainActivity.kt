@@ -1,45 +1,44 @@
 package com.twq.todolist
 
-import android.app.ActivityManager
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.hardware.camera2.params.ColorSpaceTransform
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
+import com.google.android.gms.tasks.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.protobuf.Timestamp
-import com.google.protobuf.TimestampOrBuilder
+import com.google.type.DateTime
 import com.twq.todolist.Model.Tasks
 import com.twq.todolist.Model.todoAdapter
 import java.util.*
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
     private lateinit var  db: FirebaseFirestore
     private lateinit var dialogView: View
+    private lateinit var customDialog: AlertDialog
+    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var todoAdapter: todoAdapter
+
+    var taskList= mutableListOf<Tasks>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-         db =FirebaseFirestore.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         // Toolbar //
         var mtoolbar = findViewById<Toolbar>(R.id.mToolbar)
@@ -47,110 +46,111 @@ class MainActivity : AppCompatActivity() {
         //mtoolbar.setNavigationIcon(R.drawable.ic_edit)
         setSupportActionBar(mtoolbar)
 
-        // Floating button to add a task to the list
-        var fab = findViewById<FloatingActionButton>(R.id.floatingActionButtonAdd)
-        var mRecyclerView = findViewById<RecyclerView>(R.id.mRecyclerView)
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
 
 
-        db.collection("Tasks").get()
-            .addOnSuccessListener { result ->
-                var taskList = mutableListOf<Tasks>()
-                for (document in result) {
-                    //println("${document.getString("member")} ${document.getString("taskName")}")
-                    taskList.add(Tasks(null,
-                        document.getString("taskName")?:"",
-                        (document.get("date")as? Date).toString(),
-                        document.getString(" ")?:""))
-                }
-                println(taskList.size)
-                mRecyclerView.adapter = todoAdapter(taskList)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-            }
-
-
-        dialogView = layoutInflater.inflate(R.layout.custom_layout,null)
-        var customDialog = AlertDialog.Builder(this).setView(dialogView) .create()
+        dialogView = layoutInflater.inflate(R.layout.custom_layout, null)
+        customDialog = AlertDialog.Builder(this).setView(dialogView).create()
         customDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        var fab = findViewById<FloatingActionButton>(R.id.floatingActionButtonAdd)
         fab.setOnClickListener {
             addDialog(dialogView)
             customDialog.show()
-
-
+            //mRecyclerView.adapter!!.notifyDataSetChanged()
         }
     }
 
+    override fun onStart() {
+            super.onStart()
+            mRecyclerView = findViewById<RecyclerView>(R.id.mRecyclerView)
+            mRecyclerView.layoutManager = LinearLayoutManager(this)
+
+            db.collection("Tasks").get()
+                .addOnSuccessListener { result ->
+                    taskList.clear()
+                    for (document in result) {
+                        taskList.add(Tasks(
+                            document.id,
+                            document.getString("taskName")!!,
+                            document.getDate("date") as Date,
+                            document.getString("description")!!,
+                            document.getBoolean("isChecked")!!
+                        ))
+                    }
+                    todoAdapter = todoAdapter(taskList,db)
+                    mRecyclerView.adapter = todoAdapter
+
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                }
+            //Timestamp compareTo(Date)// open fun compareTo(other: Date!): Int
+
+
+        }
 
     fun addDialog(view:View){
         // Date and Time //
-        var textViewDate = dialogView.findViewById<TextView>(R.id.textViewDate)
-        var textViewTime = dialogView.findViewById<TextView>(R.id.textViewTime)
-        var editTextDate = dialogView.findViewById<EditText>(R.id.editTextDate)
-        var editTextTime = dialogView.findViewById<EditText>(R.id.editTextTime)
+
+        var backButton = dialogView.findViewById<ImageView>(R.id.imageViewBackDetails)
+        backButton.setOnClickListener {
+            customDialog.dismiss()
+        }
+
+        var editTextDate = dialogView.findViewById<EditText>(R.id.editTextDateView)
 
         var c = Calendar.getInstance()
         var year = c.get(Calendar.YEAR)
         var month = c.get(Calendar.MONTH)
         var day = c.get(Calendar.DAY_OF_MONTH)
 
+        var date = Date()
         editTextDate.setOnClickListener {
             var datePickerDialog = DatePickerDialog(this,
                 DatePickerDialog.OnDateSetListener { view, year, month, day ->
-                    textViewDate?.text = "$day/${month+1}/$year"
+                    editTextDate.setText("$day/${month+1}/$year")
+                    date = Date(year,month,day)
+                    //c.timeInMillis
+                    //date.toInstant()
                 }, year, month, day)
             datePickerDialog.show()
         }
-
-        var t = Calendar.getInstance()
-        var hour = t.get(Calendar.HOUR)
-        var minute = t.get(Calendar.MINUTE)
-
-        editTextTime.setOnClickListener {
-            var timeDialogListener = TimePickerDialog(this,
-                TimePickerDialog.OnTimeSetListener { view, hour, minute ->
-                    textViewTime?.text = "$hour:$minute"
-                }, hour, minute, true)
-            timeDialogListener.show()
-        }
-        ///////////////
+        //DateTime.parse(date.toDate().toString())
+        //DateTime.parser()
 
         // Add button //
-        var buttonAddDialog = dialogView.findViewById<Button>(R.id.buttonAddDialog)
+        var buttonAddDialog = dialogView.findViewById<Button>(R.id.buttonDeleteItem)
         buttonAddDialog?.setOnClickListener {
             //Add dialog
-            var textEditTaskName = dialogView.findViewById<EditText>(R.id.inputEditTextTaskName)
-            var textEditDesciption = dialogView.findViewById<EditText>(R.id.inputEditTextDescription)
+            var textEditTaskName = dialogView.findViewById<EditText>(R.id.editTextNameView)
+            var textEditDesciption = dialogView.findViewById<EditText>(R.id.editTextDescriptionView)
             var TaskName = textEditTaskName?.text.toString()
             var TaskDescription = textEditDesciption?.text.toString()
-            var Date = editTextDate?.text.toString()
+
 
             val task = hashMapOf(
                 "taskName" to TaskName,
-                "date" to com.google.firebase.Timestamp(System.currentTimeMillis()),
+                "date" to date,
                 "description" to TaskDescription,
                 "isChecked" to false
             )
+
+            val taskInstance = Tasks(null, TaskName, date, TaskDescription, false)
             db.collection("Tasks").add(task).addOnSuccessListener { dr->
                 textEditTaskName?.text?.clear()
                 editTextDate?.text?.clear()
+                textEditDesciption?.text?.clear()
+                taskList.add(taskInstance)
+                todoAdapter.notifyDataSetChanged()
                 Toast.makeText(this, "Task has been added $dr", Toast.LENGTH_SHORT).show()
-
             }.addOnFailureListener {  e ->
                 Toast.makeText(this, "Not added "+e, Toast.LENGTH_SHORT).show()
             }
+            customDialog.dismiss()
+            //startActivity(getIntent())
         }
+
     }
-
-
-
-
-
-
-
-
 
     // Tool bar menu items
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
