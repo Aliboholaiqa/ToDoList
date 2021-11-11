@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.type.DateTime
 import com.twq.todolist.Model.Tasks
@@ -65,25 +66,26 @@ class MainActivity : AppCompatActivity() {
             mRecyclerView = findViewById<RecyclerView>(R.id.mRecyclerView)
             mRecyclerView.layoutManager = LinearLayoutManager(this)
 
-            db.collection("Tasks").get()
-                .addOnSuccessListener { result ->
+            db.collection("Tasks")
+                .addSnapshotListener { result, error ->
                     taskList.clear()
-                    for (document in result) {
-                        taskList.add(Tasks(
-                            document.id,
-                            document.getString("taskName")!!,
-                            document.getDate("date") as Date,
-                            document.getString("description")!!,
-                            document.getBoolean("isChecked")!!
-                        ))
+                    if (result != null) {
+                        for (document in result) {
+                            taskList.add(Tasks(
+                                document.id,
+                                document.getString("taskName")!!,
+                                document.getDate("date") as Date,
+                                document.getString("description")!!,
+                                document.getDate("creationDate") as Date,
+                                document.getBoolean("checkbox")!!
+                            ))
+                        }
                     }
                     todoAdapter = todoAdapter(taskList,db)
                     mRecyclerView.adapter = todoAdapter
 
                 }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-                }
+
             //Timestamp compareTo(Date)// open fun compareTo(other: Date!): Int
 
 
@@ -127,25 +129,30 @@ class MainActivity : AppCompatActivity() {
             var TaskName = textEditTaskName?.text.toString()
             var TaskDescription = textEditDesciption?.text.toString()
 
+            var creationDate = Date(year,month,day)
+
 
             val task = hashMapOf(
                 "taskName" to TaskName,
                 "date" to date,
                 "description" to TaskDescription,
-                "isChecked" to false
+                "creationDate" to creationDate,
+                "checkbox" to false
             )
 
-            val taskInstance = Tasks(null, TaskName, date, TaskDescription, false)
+            val taskInstance = Tasks(null, TaskName, date, TaskDescription, creationDate, false)
             db.collection("Tasks").add(task).addOnSuccessListener { dr->
                 textEditTaskName?.text?.clear()
                 editTextDate?.text?.clear()
                 textEditDesciption?.text?.clear()
-                taskList.add(taskInstance)
-                todoAdapter.notifyDataSetChanged()
-                Toast.makeText(this, "Task has been added $dr", Toast.LENGTH_SHORT).show()
+
+                //taskList.add(taskInstance)
+                //todoAdapter.notifyDataSetChanged()
+                Toast.makeText(this, "Task has been added", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener {  e ->
                 Toast.makeText(this, "Not added "+e, Toast.LENGTH_SHORT).show()
             }
+            onStart()
             customDialog.dismiss()
             //startActivity(getIntent())
         }

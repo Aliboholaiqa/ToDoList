@@ -1,5 +1,6 @@
 package com.twq.todolist.Model
 
+import com.google.firebase.Timestamp
 import java.io.Serializable
 import java.util.*
 
@@ -8,5 +9,6 @@ data class Tasks(
     var taskName: String?,
     var date: Date,
     var description: String?,
-    var isChecked: Boolean = false
+    var creationDate: Date,
+    var checkbox: Boolean = false
 ) : Serializable

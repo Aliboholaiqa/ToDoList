@@ -39,7 +39,7 @@ class Activity_list_Item : AppCompatActivity() {
 
         taskName.setText(task.taskName)
         taskDescription.setText(task.description)
-        taskDate.setText(task.date.toString())
+        //taskDate.setText(task.date.toString())
 
 
         var buttonDelete = findViewById<Button>(R.id.buttonDeleteItem)
@@ -72,32 +72,33 @@ class Activity_list_Item : AppCompatActivity() {
         var day = c.get(Calendar.DAY_OF_MONTH)
 
         var date = Date()
+
         taskDate.setOnClickListener {
             var datePickerDialog = DatePickerDialog(this,
                 DatePickerDialog.OnDateSetListener { view, year, month, day ->
                     taskDate.setText("$day/${month+1}/$year")
                     date = Date(year,month,day)
+
                 }, year, month, day)
             datePickerDialog.show()
         }
 
         var buttonUpdate = findViewById<Button>(R.id.buttonUpdateItem)
         buttonUpdate?.setOnClickListener {
-
-
-
             val updateName = taskName?.text.toString()
             val updateDescription = taskDescription?.text.toString()
-
+            var creationDate = Date(year,month,day)
             db.collection("Tasks").document(task.id!!)
                 .update(mapOf(
-                    "isChecked" to false,
+                    "checkbox" to false,
                     "taskName" to updateName,
                     "description" to updateDescription,
                     "date" to date,
+                    "creationDate" to creationDate
                 ))
                 .addOnSuccessListener { Log.d(TAG,"Task Updated ${task.id!!}") }
                 .addOnFailureListener { Log.d(TAG,"Failed to delete Task ") }
+
             finish()
         }
 
