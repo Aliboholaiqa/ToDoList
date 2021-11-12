@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">To-Do</string>
+    <string name="app_name">قائمة المهام</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="search">Search</string>
+    <string name="search">البحث</string>
     <string name="appName">To-Do</string>
     <string name="edit">edit</string>
     <string name="add_a_task">Add a task</string>

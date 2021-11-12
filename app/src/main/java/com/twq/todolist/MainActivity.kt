@@ -47,6 +47,18 @@ class MainActivity : AppCompatActivity() {
         //mtoolbar.setNavigationIcon(R.drawable.ic_edit)
         setSupportActionBar(mtoolbar)
 
+        var searchView = findViewById<SearchView>(R.id.searchView)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    return true
+                }
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    var newData = taskList.filter {task: Tasks -> task.taskName?.toLowerCase()!!.contains(p0!!)  } as MutableList<Tasks>
+                    mRecyclerView.adapter = todoAdapter(newData,db)
+                    return true
+                }
+        })
+
 
 
         dialogView = layoutInflater.inflate(R.layout.custom_layout, null)
@@ -57,7 +69,6 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             addDialog(dialogView)
             customDialog.show()
-            //mRecyclerView.adapter!!.notifyDataSetChanged()
         }
     }
 
@@ -83,24 +94,20 @@ class MainActivity : AppCompatActivity() {
                     }
                     todoAdapter = todoAdapter(taskList,db)
                     mRecyclerView.adapter = todoAdapter
+                    todoAdapter.data.sortBy{
+                        it.date
+                    }
 
                 }
-
-            //Timestamp compareTo(Date)// open fun compareTo(other: Date!): Int
-
-
         }
 
     fun addDialog(view:View){
-        // Date and Time //
-
         var backButton = dialogView.findViewById<ImageView>(R.id.imageViewBackDetails)
         backButton.setOnClickListener {
             customDialog.dismiss()
         }
-
         var editTextDate = dialogView.findViewById<EditText>(R.id.editTextDateView)
-
+        ////// Date ///////
         var c = Calendar.getInstance()
         var year = c.get(Calendar.YEAR)
         var month = c.get(Calendar.MONTH)
@@ -112,18 +119,17 @@ class MainActivity : AppCompatActivity() {
                 DatePickerDialog.OnDateSetListener { view, year, month, day ->
                     editTextDate.setText("$day/${month+1}/$year")
                     date = Date(year,month,day)
-                    //c.timeInMillis
-                    //date.toInstant()
+
                 }, year, month, day)
             datePickerDialog.show()
         }
         //DateTime.parse(date.toDate().toString())
         //DateTime.parser()
 
-        // Add button //
+        // Add button listener //
         var buttonAddDialog = dialogView.findViewById<Button>(R.id.buttonDeleteItem)
         buttonAddDialog?.setOnClickListener {
-            //Add dialog
+
             var textEditTaskName = dialogView.findViewById<EditText>(R.id.editTextNameView)
             var textEditDesciption = dialogView.findViewById<EditText>(R.id.editTextDescriptionView)
             var TaskName = textEditTaskName?.text.toString()
@@ -131,7 +137,7 @@ class MainActivity : AppCompatActivity() {
 
             var creationDate = Date(year,month,day)
 
-
+            // Adding the Map //
             val task = hashMapOf(
                 "taskName" to TaskName,
                 "date" to date,
@@ -140,12 +146,11 @@ class MainActivity : AppCompatActivity() {
                 "checkbox" to false
             )
 
-            val taskInstance = Tasks(null, TaskName, date, TaskDescription, creationDate, false)
+            //val taskInstance = Tasks(null, TaskName, date, TaskDescription, creationDate, false)
             db.collection("Tasks").add(task).addOnSuccessListener { dr->
                 textEditTaskName?.text?.clear()
                 editTextDate?.text?.clear()
                 textEditDesciption?.text?.clear()
-
                 //taskList.add(taskInstance)
                 //todoAdapter.notifyDataSetChanged()
                 Toast.makeText(this, "Task has been added", Toast.LENGTH_SHORT).show()
@@ -154,7 +159,6 @@ class MainActivity : AppCompatActivity() {
             }
             onStart()
             customDialog.dismiss()
-            //startActivity(getIntent())
         }
 
     }
@@ -165,20 +169,20 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.item_search ->{
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "This is my text to send.")
-                    type = "text/plain"
-                }
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                startActivity(shareIntent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when(item.itemId){
+//            R.id.item_search ->{
+//                val sendIntent: Intent = Intent().apply {
+//                    action = Intent.ACTION_SEND
+//                    putExtra(Intent.EXTRA_TEXT, "This is my text to send.")
+//                    type = "text/plain"
+//                }
+//                val shareIntent = Intent.createChooser(sendIntent, null)
+//                startActivity(shareIntent)
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 }
 /*
 // Page Transformer for Animation
