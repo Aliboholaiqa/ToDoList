@@ -45,6 +45,7 @@ class Activity_list_Item : AppCompatActivity() {
         var months = task.date.month+1
         taskDate.setText(task.date.date.toString()+ "/"+ months.toString()+ "/"+task.date.year.toString())
 
+        //--------- Delete ---------//
 
         var buttonDelete = findViewById<Button>(R.id.buttonDeleteItem)
         buttonDelete?.setOnClickListener {
@@ -70,6 +71,9 @@ class Activity_list_Item : AppCompatActivity() {
             }
         }
 
+
+        //--------- Update ---------//
+
         var c = Calendar.getInstance()
         var year = c.get(Calendar.YEAR)
         var month = c.get(Calendar.MONTH)
@@ -86,7 +90,6 @@ class Activity_list_Item : AppCompatActivity() {
                 }, year, month, day)
             datePickerDialog.show()
         }
-
 
         var buttonUpdate = findViewById<Button>(R.id.buttonUpdateItem)
         buttonUpdate?.setOnClickListener {
@@ -105,7 +108,6 @@ class Activity_list_Item : AppCompatActivity() {
                     Toast.makeText(this, "Task updated", Toast.LENGTH_SHORT).show()
                     Log.d(TAG,"Task Updated ${task.id!!}") }
                 .addOnFailureListener { Log.d(TAG,"Failed to delete Task ") }
-
             finish()
         }
 

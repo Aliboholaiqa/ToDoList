@@ -95,7 +95,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     todoAdapter = todoAdapter(taskList,db)
-                    //mRecyclerView.adapter = todoAdapter
 
                     var sortingList = arrayOf("Default","A-Z", "Z-A", "Ascending Date", "Descending Date")
                     var spinner = findViewById<Spinner>(R.id.spinner)
@@ -112,9 +111,7 @@ class MainActivity : AppCompatActivity() {
                                 4 -> todoAdapter.data.sortByDescending { it.date}
                             }
 
-                            //todoAdapter = todoAdapter(taskList,db)
                             mRecyclerView.adapter = todoAdapter
-                            // mRecyclerView.adapter = todoAdapter(newData,db)
 
                             Log.d("Doc","The selected is ${todoAdapter.data[position]}")
                         }
@@ -175,8 +172,6 @@ class MainActivity : AppCompatActivity() {
                 textEditTaskName?.text?.clear()
                 editTextDate?.text?.clear()
                 textEditDesciption?.text?.clear()
-                //taskList.add(taskInstance)
-                //todoAdapter.notifyDataSetChanged()
                 Toast.makeText(this, "Task has been added", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener {  e ->
                 Toast.makeText(this, "Not added "+e, Toast.LENGTH_SHORT).show()
@@ -193,20 +188,7 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when(item.itemId){
-//            R.id.item_search ->{
-//                val sendIntent: Intent = Intent().apply {
-//                    action = Intent.ACTION_SEND
-//                    putExtra(Intent.EXTRA_TEXT, "This is my text to send.")
-//                    type = "text/plain"
-//                }
-//                val shareIntent = Intent.createChooser(sendIntent, null)
-//                startActivity(shareIntent)
-//            }
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
+
 }
 
 
