@@ -68,7 +68,7 @@
             android:id="@+id/buttonDeleteItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="@string/add"
             android:textColor="#000000"
             android:textStyle="bold"

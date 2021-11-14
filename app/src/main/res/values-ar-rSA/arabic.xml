@@ -4,29 +4,27 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search">البحث</string>
-    <string name="appName">To-Do</string>
-    <string name="edit">edit</string>
-    <string name="add_a_task">Add a task</string>
-    <string name="add">Add</string>
-    <string name="choose_a_date">Choose a date</string>
-    <string name="choose_a_time">Choose a time</string>
-    <string name="task_name">Task Name</string>
-    <string name="description">Description</string>
-    <string name="time">Time</string>
-    <string name="date">Date</string>
-    <string name="title_activity_listdetails">activity_listdetails</string>
+    <string name="appName">قائمة المهام</string>
+    <string name="edit">التعديل</string>
+    <string name="add_a_task">إضافة مهمة جديدة</string>
+    <string name="add">إضافة</string>
+    <string name="choose_a_date">إختر التاريخ</string>
+    <string name="task_name">إسم المهمه</string>
+    <string name="description">الوصف</string>
+    <string name="date">التاريخ</string>
+    <string name="title_activity_listdetails">تفاصيل المهمه</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
     <string name="title_activity_list__item">Activity_list_Item</string>
-    <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
-    <string name="textviewtaskname">taskname</string>
+    <string name="cancel">إلغاء</string>
+    <string name="delete">حذف</string>
+    <string name="textviewtaskname">إسم المهمه</string>
     <string name="textviewDate">TextViewDate</string>
-    <string name="update">Update</string>
-    <string name="to_do">To-Do</string>
-    <string name="delete_a_task">Delete a task</string>
-    <string name="do_you_want_to_delete_the_task">Do you want to delete the task?</string>
+    <string name="update">تحديث</string>
+    <string name="to_do">إنجاز المهام</string>
+    <string name="delete_a_task">حذف مهمه</string>
+    <string name="do_you_want_to_delete_the_task">هل ترغب بحذف المهمه؟</string>
 </resources>

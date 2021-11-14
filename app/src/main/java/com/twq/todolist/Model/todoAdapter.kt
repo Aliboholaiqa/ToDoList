@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.twq.todolist.Activity_list_Item
@@ -42,18 +43,18 @@ class todoAdapter(var data: MutableList<Tasks>, var firebaseDB: FirebaseFirestor
             var today = Date(year,month,day)
             var months = data[position].date.month+1
 
-
-            if (holder.tvCbDone.isChecked){
+            if (holder.tvCbDone.isChecked) {
                 holder.tvTaskDate.text = "Completed"
             }else {
                 /// Past due ///
                 if (today > data[position].date) {
-                    holder.tvTaskDate.text = ("Past due: " + data[position].date.date.toString()
+                    holder.tvTaskDate.text = ("Past Due: "+data[position].date.date.toString()
                             + "/" + months.toString() + "/" + data[position].date.year.toString())
                     holder.tvTaskDate.setTextColor(Color.parseColor("#FF0000"))
                     holder.tvTaskDate.setTypeface(null, Typeface.ITALIC)
                     /// Due today ///
                 } else if (today.equals(data[position].date)) {
+
                     holder.tvTaskDate.text = ("Due today: " + data[position].date.date.toString()
                             + "/" + months.toString() + "/" + data[position].date.year.toString())
                     holder.tvTaskDate.setTextColor(Color.parseColor("#009CFF"))
@@ -64,30 +65,25 @@ class todoAdapter(var data: MutableList<Tasks>, var firebaseDB: FirebaseFirestor
                             + "/" + months.toString() + "/" + data[position].date.year.toString())
                 }
             }
-            /// Checkbox ///
+                /// Checkbox ///
+                toggleStrickThrough(holder.tvTaskName, data[position].checkbox)
+                holder.tvCbDone.setOnCheckedChangeListener { compoundButton, isChecked ->
+                    if (compoundButton!!.isChecked) {
+                        firebaseDB?.collection("Tasks")
+                                ?.document(data[position].id!!)
+                                ?.update(mapOf(
+                                        "checkbox" to true
+                                ))
+                    } else {
+                        firebaseDB?.collection("Tasks")
+                                ?.document(data[position].id!!)
+                                ?.update(mapOf(
+                                        "checkbox" to false
+                                ))
+                    }
+                    toggleStrickThrough(holder.tvTaskName, data[position].checkbox)
 
-            toggleStrickThrough(holder.tvTaskName,data[position].checkbox)
-            holder.tvCbDone.setOnCheckedChangeListener { compoundButton, isChecked ->
-                if(compoundButton.isChecked){
-                    firebaseDB?.collection("Tasks")
-                        ?.document(data[position].id!!)
-                        ?.update(mapOf(
-                            "checkbox" to true
-                        ))
-                    holder.tvTaskName.paintFlags =holder.tvTaskName.paintFlags or STRIKE_THRU_TEXT_FLAG
-
-                }else{
-                    firebaseDB?.collection("Tasks")
-                        ?.document(data[position].id!!)
-                        ?.update(mapOf(
-                            "checkbox" to false
-                        ))
-                    holder.tvTaskName.paintFlags = holder.tvTaskName.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
                 }
-            }
-
-
-
 
             /// Intent ///
             holder.itemView.setOnClickListener {
@@ -106,5 +102,4 @@ class todoAdapter(var data: MutableList<Tasks>, var firebaseDB: FirebaseFirestor
         var tvTaskName = v.findViewById<TextView>(R.id.textViewTaskName)
         var tvTaskDate = v.findViewById<TextView>(R.id.textViewDate)
         var tvCbDone = v.findViewById<CheckBox>(R.id.checkBoxDone)
-
     }

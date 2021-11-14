@@ -9,9 +9,9 @@
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="59dp"
         app:layout_constraintBottom_toTopOf="@+id/mRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/spinner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mToolbar" />
 
@@ -24,7 +24,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchView" />
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/mToolbar"
@@ -53,5 +53,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add"
         android:focusable="true" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchView" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/divider2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/searchView"
+        app:layout_constraintTop_toBottomOf="@+id/mToolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

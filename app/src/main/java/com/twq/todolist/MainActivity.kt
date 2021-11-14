@@ -7,9 +7,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.util.Log
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -60,7 +59,6 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-
         dialogView = layoutInflater.inflate(R.layout.custom_layout, null)
         customDialog = AlertDialog.Builder(this).setView(dialogView).create()
         customDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -72,33 +70,61 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onStart() {
             super.onStart()
+
             mRecyclerView = findViewById<RecyclerView>(R.id.mRecyclerView)
             mRecyclerView.layoutManager = LinearLayoutManager(this)
 
+            taskList.clear()
             db.collection("Tasks")
                 .addSnapshotListener { result, error ->
                     taskList.clear()
                     if (result != null) {
                         for (document in result) {
                             taskList.add(Tasks(
-                                document.id,
-                                document.getString("taskName")!!,
-                                document.getDate("date") as Date,
-                                document.getString("description")!!,
-                                document.getDate("creationDate") as Date,
-                                document.getBoolean("checkbox")!!
+                                    document.id,
+                                    document.getString("taskName")!!,
+                                    document.getDate("date") as Date,
+                                    document.getString("description")!!,
+                                    document.getDate("creationDate") as Date,
+                                    document.getBoolean("checkbox")!!
                             ))
                         }
                     }
+
                     todoAdapter = todoAdapter(taskList,db)
-                    mRecyclerView.adapter = todoAdapter
-                    todoAdapter.data.sortBy{
-                        it.date
+                    //mRecyclerView.adapter = todoAdapter
+
+                    var sortingList = arrayOf("Default","A-Z", "Z-A", "Ascending Date", "Descending Date")
+                    var spinner = findViewById<Spinner>(R.id.spinner)
+                    spinner.adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sortingList)
+
+                    spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            //var newData = mutableListOf<Tasks>()
+                            when(position){
+                                0 -> todoAdapter.data.sortBy{ it.date }
+                                1 -> todoAdapter.data.sortBy { it.taskName }
+                                2 -> todoAdapter.data.sortByDescending { it.taskName }
+                                3 -> todoAdapter.data.sortBy{ it.date }
+                                4 -> todoAdapter.data.sortByDescending { it.date}
+                            }
+
+                            //todoAdapter = todoAdapter(taskList,db)
+                            mRecyclerView.adapter = todoAdapter
+                            // mRecyclerView.adapter = todoAdapter(newData,db)
+
+                            Log.d("Doc","The selected is ${todoAdapter.data[position]}")
+                        }
+                        override fun onNothingSelected(parent: AdapterView<*>) {
+                        }
                     }
 
                 }
+
+
         }
 
     fun addDialog(view:View){
@@ -123,8 +149,6 @@ class MainActivity : AppCompatActivity() {
                 }, year, month, day)
             datePickerDialog.show()
         }
-        //DateTime.parse(date.toDate().toString())
-        //DateTime.parser()
 
         // Add button listener //
         var buttonAddDialog = dialogView.findViewById<Button>(R.id.buttonDeleteItem)
@@ -157,7 +181,7 @@ class MainActivity : AppCompatActivity() {
             }.addOnFailureListener {  e ->
                 Toast.makeText(this, "Not added "+e, Toast.LENGTH_SHORT).show()
             }
-            onStart()
+           // onStart()
             customDialog.dismiss()
         }
 
@@ -184,47 +208,6 @@ class MainActivity : AppCompatActivity() {
 //        return super.onOptionsItemSelected(item)
 //    }
 }
-/*
-// Page Transformer for Animation
-private const val MIN_SCALE = 0.75f
-class DepthPageTransformer : ViewPager2.PageTransformer {
-    override fun transformPage(view: View, position: Float) {
-        view.apply {
-            val pageWidth = width
-            when {
-                position < -1 -> { // [-Infinity,-1)
-                    // This page is way off-screen to the left.
-                    alpha = 0f
-                }
-                position <= 0 -> { // [-1,0]
-                    // Use the default slide transition when moving to the left page
-                    alpha = 1f
-                    translationX = 0f
-                    translationZ = 0f
-                    scaleX = 1f
-                    scaleY = 1f
-                }
-                position <= 1 -> { // (0,1]
-                    // Fade the page out.
-                    alpha = 1 - position
 
-                    // Counteract the default slide transition
-                    translationX = pageWidth * -position
-                    // Move it behind the left page
-                    translationZ = -1f
 
-                    // Scale the page down (between MIN_SCALE and 1)
-                    val scaleFactor = (MIN_SCALE + (1 - MIN_SCALE) * (1 - Math.abs(position)))
-                    scaleX = scaleFactor
-                    scaleY = scaleFactor
-                }
-                else -> { // (1,+Infinity]
-                    // This page is way off-screen to the right.
-                    alpha = 0f
-                }
-            }
-        }
-    }
-   }
- */
 

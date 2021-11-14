@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
@@ -27,7 +28,6 @@ class Activity_list_Item : AppCompatActivity() {
 
         var backButton = findViewById<ImageView>(R.id.imageViewBackDetails)
         backButton.setOnClickListener {
-
             finish()
         }
 
@@ -37,9 +37,13 @@ class Activity_list_Item : AppCompatActivity() {
 
         var task = intent.getSerializableExtra("task") as Tasks
 
+
+
         taskName.setText(task.taskName)
         taskDescription.setText(task.description)
-        //taskDate.setText(task.date.toString())
+
+        var months = task.date.month+1
+        taskDate.setText(task.date.date.toString()+ "/"+ months.toString()+ "/"+task.date.year.toString())
 
 
         var buttonDelete = findViewById<Button>(R.id.buttonDeleteItem)
@@ -53,7 +57,9 @@ class Activity_list_Item : AppCompatActivity() {
             buttonDeleteItem.setOnClickListener {
                 db.collection("Tasks").document(task.id!!)
                     .delete()
-                    .addOnSuccessListener { Log.d(TAG,"Successfully deleted ${task.id!!}") }
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG,"Successfully deleted ${task.id!!}") }
                     .addOnFailureListener { Log.d(TAG,"Failed to delete ") }
                 deleteDialog.dismiss()
                 finish()
@@ -64,14 +70,12 @@ class Activity_list_Item : AppCompatActivity() {
             }
         }
 
-
-
         var c = Calendar.getInstance()
         var year = c.get(Calendar.YEAR)
         var month = c.get(Calendar.MONTH)
         var day = c.get(Calendar.DAY_OF_MONTH)
 
-        var date = Date()
+        var date = Date(task.date.year,task.date.month,task.date.date)
 
         taskDate.setOnClickListener {
             var datePickerDialog = DatePickerDialog(this,
@@ -82,6 +86,7 @@ class Activity_list_Item : AppCompatActivity() {
                 }, year, month, day)
             datePickerDialog.show()
         }
+
 
         var buttonUpdate = findViewById<Button>(R.id.buttonUpdateItem)
         buttonUpdate?.setOnClickListener {
@@ -96,7 +101,9 @@ class Activity_list_Item : AppCompatActivity() {
                     "date" to date,
                     "creationDate" to creationDate
                 ))
-                .addOnSuccessListener { Log.d(TAG,"Task Updated ${task.id!!}") }
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Task updated", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG,"Task Updated ${task.id!!}") }
                 .addOnFailureListener { Log.d(TAG,"Failed to delete Task ") }
 
             finish()
